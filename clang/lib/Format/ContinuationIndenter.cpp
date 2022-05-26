@@ -369,6 +369,11 @@ bool ContinuationIndenter::mustBreak(const LineState &State) {
     auto LambdaBodyLength = getLengthToMatchingParen(Current, State.Stack);
     return LambdaBodyLength > getColumnLimit(State);
   }
+  if (Style.BreakBeforeBraces == FormatStyle::BS_Allman && Current.CanBreakBefore &&
+      Current.is(tok::l_brace)) {
+    auto LineLength = getLengthToMatchingParen(Current, State.Stack);
+    return LineLength > getColumnLimit(State);
+  }
   if (Current.MustBreakBefore ||
       (Current.is(TT_InlineASMColon) &&
        (Style.BreakBeforeInlineASMColon == FormatStyle::BBIAS_Always ||
@@ -1398,6 +1403,11 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
 
   if (NextNonComment->isOneOf(TT_StartOfName, TT_PointerOrReference) ||
       Previous.isOneOf(tok::coloncolon, tok::equal, TT_JsTypeColon)) {
+    // Indentation of Allman style initializers.
+    if (Style.BreakBeforeBraces == FormatStyle::BS_Allman &&
+      NextNonComment->is(tok::l_brace)) {
+      return CurrentState.Indent;
+    }
     return ContinuationIndent;
   }
   if (PreviousNonComment && PreviousNonComment->is(tok::colon) &&

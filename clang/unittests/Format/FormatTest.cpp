@@ -20200,6 +20200,47 @@ TEST_F(FormatTest, AllmanBraceBreaking) {
                "#endif",
                AllmanBraceStyle);
 
+  verifyFormat("void f(int a)\n"
+               "{\n"
+               "  struct A1\n"
+               "  {\n"
+               "    int a;\n"
+               "    struct B\n"
+               "    {\n"
+               "      int b;\n"
+               "    }\n"
+               "  }\n"
+               "  a1 = {.a = {.b = 1}};\n"
+               "  struct A2\n"
+               "  {\n"
+               "    int a;\n"
+               "    struct B\n"
+               "    {\n"
+               "      int b;\n"
+               "    }\n"
+               "  }\n"
+               "  a2 =\n"
+               "  {\n"
+               "    .a = {.b = 1},\n"
+               "  };\n"
+               "  struct A3\n"
+               "  {\n"
+               "    int a;\n"
+               "    struct B\n"
+               "    {\n"
+               "      int b;\n"
+               "    }\n"
+               "  }\n"
+               "  a3 =\n"
+               "  {\n"
+               "    .a =\n"
+               "    {\n"
+               "      .b = 1,\n"
+               "    },\n"
+               "  };\n"
+               "}",
+               AllmanBraceStyle);
+
   EXPECT_EQ(AllmanBraceStyle.AllowShortLambdasOnASingleLine,
             FormatStyle::SLS_All);
 
