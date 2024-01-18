@@ -67,6 +67,11 @@ static cl::opt<std::string>
           cl::init(clang::format::DefaultFormatStyle),
           cl::cat(ClangFormatCategory));
 static cl::opt<std::string>
+    StyleDir("style-dir",
+             cl::desc("The directory where to look for matching style files\n"
+                      "instead of the current working directory.\n"),
+             cl::init("."), cl::cat(ClangFormatCategory));
+static cl::opt<std::string>
     FallbackStyle("fallback-style",
                   cl::desc("The name of the predefined style used as a\n"
                            "fallback in case clang-format is invoked with\n"
@@ -439,8 +444,11 @@ static bool format(StringRef FileName, bool IsSTDIN) {
     return true;
   }
 
+  auto AbsoluteAssumedFileName = (StyleDir + "/" + AssumedFileName).str();
+  if (AssumedFileName[0] != '/')
+    AssumedFileName = AbsoluteAssumedFileName;
   llvm::Expected<FormatStyle> FormatStyle =
-      getStyle(Style, AssumedFileName, FallbackStyle, Code->getBuffer(),
+      getStyle(Style, AbsoluteAssumedFileName, FallbackStyle, Code->getBuffer(),
                nullptr, WNoErrorList.isSet(WNoError::Unknown));
   if (!FormatStyle) {
     llvm::errs() << llvm::toString(FormatStyle.takeError()) << "\n";
