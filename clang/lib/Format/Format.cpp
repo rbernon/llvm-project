@@ -755,6 +755,7 @@ template <> struct MappingTraits<FormatStyle::SpacesInParensCustom> {
     IO.mapOptional("InCStyleCasts", Spaces.InCStyleCasts);
     IO.mapOptional("InConditionalStatements", Spaces.InConditionalStatements);
     IO.mapOptional("InEmptyParentheses", Spaces.InEmptyParentheses);
+    IO.mapOptional("InFunctionParentheses", Spaces.InFunctionParentheses);
     IO.mapOptional("Other", Spaces.Other);
   }
 };
@@ -1197,6 +1198,7 @@ template <> struct MappingTraits<FormatStyle> {
             SpacesInCStyleCastParentheses;
         Style.SpacesInParensOptions.InEmptyParentheses =
             SpaceInEmptyParentheses;
+        Style.SpacesInParensOptions.InFunctionParentheses = true;
         Style.SpacesInParensOptions.Other = true;
       } else {
         Style.SpacesInParensOptions = {};

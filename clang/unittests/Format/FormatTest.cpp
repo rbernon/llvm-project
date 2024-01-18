@@ -11169,7 +11169,7 @@ TEST_F(FormatTest, UnderstandsFunctionRefQualification) {
   verifyFormat("SomeType MemberFunction(const Deleted &) &;", Spaces);
 
   Spaces.SpacesInParensOptions.InCStyleCasts = false;
-  Spaces.SpacesInParensOptions.Other = true;
+  Spaces.SpacesInParensOptions.InFunctionParentheses = true;
   verifyFormat("Deleted &operator=( const Deleted & ) & = default;", Spaces);
   verifyFormat("SomeType MemberFunction( const Deleted & ) & = delete;",
                Spaces);
@@ -13735,6 +13735,12 @@ TEST_F(FormatTest, LayoutCxx11BraceInitializers) {
   FormatStyle SpaceBetweenBraces = getLLVMStyle();
   SpaceBetweenBraces.SpacesInAngles = FormatStyle::SIAS_Always;
   SpaceBetweenBraces.SpacesInParens = FormatStyle::SIPO_Custom;
+  SpaceBetweenBraces.SpacesInParensOptions.InFunctionParentheses = true;
+  verifyFormat("vector< int > x{1, 2, 3, 4};", SpaceBetweenBraces);
+  verifyFormat("f( {}, {{}, {}}, MyMap[{k, v}] );", SpaceBetweenBraces);
+  verifyFormat("vector< int > x{// comment 1\n"
+               "                1, 2, 3, 4};",
+               SpaceBetweenBraces);
   SpaceBetweenBraces.SpacesInParensOptions.Other = true;
   SpaceBetweenBraces.SpacesInSquareBrackets = true;
   verifyFormat("vector< int > x{ 1, 2, 3, 4 };", SpaceBetweenBraces);
@@ -16815,12 +16821,12 @@ TEST_F(FormatTest, ConfigurableSpacesInParens) {
 
   Spaces.SpacesInParens = FormatStyle::SIPO_Custom;
   Spaces.SpacesInParensOptions = {};
-  Spaces.SpacesInParensOptions.Other = true;
+  Spaces.SpacesInParensOptions.InFunctionParentheses = true;
   verifyFormat("do_something( ::globalVar );", Spaces);
   verifyFormat("call( x, y, z );", Spaces);
   verifyFormat("call();", Spaces);
-  verifyFormat("std::function<void( int, int )> callback;", Spaces);
-  verifyFormat("void inFunction() { std::function<void( int, int )> fct; }",
+  verifyFormat("std::function<void(int, int)> callback;", Spaces);
+  verifyFormat("void inFunction() { std::function<void(int, int)> fct; }",
                Spaces);
   verifyFormat("while ((bool)1)\n"
                "  continue;",
@@ -16842,9 +16848,41 @@ TEST_F(FormatTest, ConfigurableSpacesInParens) {
                "  break;\n"
                "}",
                Spaces);
+  verifyFormat("SomeType *__attribute__((attr)) *a = NULL;", Spaces);
+  verifyFormat("void __attribute__((naked)) foo( int bar )", Spaces);
+  verifyFormat("void f() __attribute__((asdf));", Spaces);
+  Spaces.SpacesInParensOptions.InFunctionParentheses = false;
+  Spaces.SpacesInParensOptions.Other = true;
+  verifyFormat("do_something(::globalVar);", Spaces);
+  verifyFormat("call(x, y, z);", Spaces);
+  verifyFormat("call();", Spaces);
+  verifyFormat("std::function<void( int, int )> callback;", Spaces);
+  verifyFormat("void inFunction() { std::function<void( int, int )> fct; }",
+               Spaces);
+  verifyFormat("while ((bool)1)\n"
+               "  continue;",
+               Spaces);
+  verifyFormat("for (;;)\n"
+               "  continue;",
+               Spaces);
+  verifyFormat("if (true)\n"
+               "  f();\n"
+               "else if (true)\n"
+               "  f();",
+               Spaces);
+  verifyFormat("do {\n"
+               "  do_something((int)i);\n"
+               "} while (something());",
+               Spaces);
+  verifyFormat("switch (x) {\n"
+               "default:\n"
+               "  break;\n"
+               "}",
+               Spaces);
   verifyFormat("SomeType *__attribute__( ( attr ) ) *a = NULL;", Spaces);
-  verifyFormat("void __attribute__( ( naked ) ) foo( int bar )", Spaces);
+  verifyFormat("void __attribute__( ( naked ) ) foo(int bar)", Spaces);
   verifyFormat("void f() __attribute__( ( asdf ) );", Spaces);
+  Spaces.SpacesInParensOptions.InFunctionParentheses = true;
   Spaces.SpacesInParensOptions.InConditionalStatements = true;
   verifyFormat("do_something( ::globalVar );", Spaces);
   verifyFormat("call( x, y, z );", Spaces);

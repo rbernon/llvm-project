@@ -5726,12 +5726,15 @@ the configuration (without a prefix: ``Auto``).
          }                                    }
        }                                    }
 
-  * ``bool Other`` Put a space in parentheses not covered by preceding options.
+  * ``bool InFunctionParentheses`` Put a space in parentheses only inside function-like statements.
 
     .. code-block:: c++
 
        true:                                  false:
        t f( Deleted & ) & = delete;   vs.     t f(Deleted &) & = delete;
+       if (g( a, b, c )) {}           vs.     if (g(a, b, c)) {}
+
+  * ``bool Other`` Put a space in parentheses not covered by preceding options.
 
 
 .. _SpacesInParentheses:

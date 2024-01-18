@@ -4025,8 +4025,14 @@ bool TokenAnnotator::spaceRequiredBetween(const AnnotatedLine &Line,
       return Style.SpacesInParensOptions.InConditionalStatements;
   }
 
-  if (RightParen || LeftParen)
+  if (RightParen || LeftParen) {
+    auto Previous = LeftParen ? LeftParen->Previous : nullptr;
+    if (Previous && Previous->is(tok::identifier))
+      return Style.SpacesInParensOptions.InFunctionParentheses;
+    if (Previous && Previous->Previous && Previous->Previous->is(tok::kw_operator))
+      return Style.SpacesInParensOptions.InFunctionParentheses;
     return Style.SpacesInParensOptions.Other;
+  }
 
   if (Right.isOneOf(tok::semi, tok::comma))
     return false;

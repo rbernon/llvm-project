@@ -4563,27 +4563,32 @@ struct FormatStyle {
     ///    }                                    }
     /// \endcode
     bool InEmptyParentheses;
-    /// Put a space in parentheses not covered by preceding options.
+    /// Put a space in parentheses only inside function-like statements.
     /// \code
     ///    true:                                  false:
     ///    t f( Deleted & ) & = delete;   vs.     t f(Deleted &) & = delete;
+    ///    if (g( a, b, c )) {}           vs.     if (g(a, b, c)) {}
     /// \endcode
+    bool InFunctionParentheses;
+    /// Put a space in parentheses not covered by preceding options.
     bool Other;
 
     SpacesInParensCustom()
         : InConditionalStatements(false), InCStyleCasts(false),
-          InEmptyParentheses(false), Other(false) {}
+          InEmptyParentheses(false), InFunctionParentheses(false), Other(false) {}
 
     SpacesInParensCustom(bool InConditionalStatements, bool InCStyleCasts,
-                         bool InEmptyParentheses, bool Other)
+                         bool InEmptyParentheses, bool InFunctionParentheses, bool Other)
         : InConditionalStatements(InConditionalStatements),
           InCStyleCasts(InCStyleCasts), InEmptyParentheses(InEmptyParentheses),
-          Other(Other) {}
+          InFunctionParentheses(InFunctionParentheses), Other(Other) {}
 
     bool operator==(const SpacesInParensCustom &R) const {
       return InConditionalStatements == R.InConditionalStatements &&
              InCStyleCasts == R.InCStyleCasts &&
-             InEmptyParentheses == R.InEmptyParentheses && Other == R.Other;
+             InEmptyParentheses == R.InEmptyParentheses &&
+             InFunctionParentheses == R.InFunctionParentheses &&
+             Other == R.Other;
     }
     bool operator!=(const SpacesInParensCustom &R) const {
       return !(*this == R);
