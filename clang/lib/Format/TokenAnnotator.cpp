@@ -4005,12 +4005,29 @@ bool TokenAnnotator::spaceRequiredBetween(const AnnotatedLine &Line,
     return true;
   }
 
-  if (Left.is(tok::l_paren) || Right.is(tok::r_paren)) {
-    return (Right.is(TT_CastRParen) ||
-            (Left.MatchingParen && Left.MatchingParen->is(TT_CastRParen)))
-               ? Style.SpacesInParensOptions.InCStyleCasts
-               : Style.SpacesInParensOptions.Other;
+  const FormatToken *RightParen = nullptr;
+  if (Right.is(tok::r_paren))
+    RightParen = &Right;
+  else if (Left.is(tok::l_paren) && Left.MatchingParen)
+    RightParen = Left.MatchingParen;
+  if (RightParen && RightParen->is(TT_CastRParen))
+    return Style.SpacesInParensOptions.InCStyleCasts;
+
+  const FormatToken *LeftParen = nullptr;
+  if (Left.is(tok::l_paren))
+    LeftParen = &Left;
+  else if (Right.is(tok::r_paren) && Right.MatchingParen)
+    LeftParen = Right.MatchingParen;
+  if (LeftParen) {
+    if (LeftParen->is(TT_ConditionLParen))
+      return Style.SpacesInParensOptions.InConditionalStatements;
+    if (LeftParen->Previous && isKeywordWithCondition(*LeftParen->Previous))
+      return Style.SpacesInParensOptions.InConditionalStatements;
   }
+
+  if (RightParen || LeftParen)
+    return Style.SpacesInParensOptions.Other;
+
   if (Right.isOneOf(tok::semi, tok::comma))
     return false;
   if (Right.is(tok::less) && Line.Type == LT_ObjCDecl) {
